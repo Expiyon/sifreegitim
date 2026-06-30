@@ -353,7 +353,7 @@ export default function Landing() {
                   <Mail className="w-6 h-6 text-teal-500 shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-bold mb-1 group-hover:text-accent transition-colors">E-Posta</h4>
-                    <p className="text-sm text-slate-400">bilgi@sifreakademi.com.tr</p>
+                    <p className="text-sm text-slate-400">sifreegitimkurumlari@gmail.com</p>
                   </div>
                 </a>
                 <a href="https://instagram.com/sifreakademi" target="_blank" rel="noopener noreferrer" className="flex gap-4 group">
