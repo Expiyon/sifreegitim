@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import PageLayout from '../components/layout/PageLayout';
 import { Card } from '../components/ui/Card';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, KeyRound, X } from 'lucide-react';
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
+import { updatePassword } from 'firebase/auth';
 import { safeFetchCollection, safeFetchQuery, query, where, collection } from '../lib/firestore';
 
 interface Exam {
@@ -18,6 +19,13 @@ export default function StudentDashboard() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [upcomingExams, setUpcomingExams] = useState<UpcomingExam[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Password Modal
+  const [pwdModal, setPwdModal] = useState(false);
+  const [newPwd, setNewPwd] = useState('');
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdSuccess, setPwdSuccess] = useState('');
+  const [pwdError, setPwdError] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -73,6 +81,26 @@ export default function StudentDashboard() {
     return { day: d.getDate().toString(), month: mn[d.getMonth()] };
   };
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auth.currentUser) return;
+    setPwdLoading(true); setPwdSuccess(''); setPwdError('');
+    try {
+      await updatePassword(auth.currentUser, newPwd);
+      setPwdSuccess('Şifreniz başarıyla güncellendi!');
+      setNewPwd('');
+      setTimeout(() => { setPwdModal(false); setPwdSuccess(''); }, 2000);
+    } catch (error: any) {
+      if (error.code === 'auth/requires-recent-login') {
+        setPwdError('Güvenlik nedeniyle şifre değiştirmeden önce çıkış yapıp tekrar giriş yapmanız gerekiyor.');
+      } else {
+        setPwdError('Şifre güncellenemedi: ' + error.message);
+      }
+    } finally {
+      setPwdLoading(false);
+    }
+  };
+
   return (
     <PageLayout role="student">
       <div className="flex justify-between items-center mb-8">
@@ -80,10 +108,38 @@ export default function StudentDashboard() {
           <h1 className="text-2xl font-bold text-navy-900 leading-tight">Şifre Akademi</h1>
           <p className="text-sm text-slate-500 font-medium">Tekrar hoş geldin, {user?.name || user?.email?.split('@')[0] || 'Öğrenci'}</p>
         </div>
-        <div className="w-10 h-10 bg-navy-900 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
-          {(user?.name || user?.email || 'Ö').charAt(0).toUpperCase()}
+        <div className="flex items-center gap-4">
+          <button onClick={() => setPwdModal(true)} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-sm font-bold transition-colors">
+            <KeyRound className="w-4 h-4" />
+            Şifre Değiştir
+          </button>
+          <div className="w-10 h-10 bg-navy-900 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            {(user?.name || user?.email || 'Ö').charAt(0).toUpperCase()}
+          </div>
         </div>
       </div>
+
+      {/* Password Change Modal */}
+      {pwdModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-xl relative">
+            <button onClick={() => { setPwdModal(false); setPwdError(''); setPwdSuccess(''); }} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+            <h3 className="text-lg font-bold text-navy-900 mb-1">Şifre Değiştir</h3>
+            <p className="text-sm text-slate-500 mb-6">Hesabınızın güvenliği için yeni bir şifre belirleyin.</p>
+            {pwdSuccess && <div className="bg-teal-50 text-teal-700 p-3 rounded-lg text-xs font-bold mb-4">{pwdSuccess}</div>}
+            {pwdError && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-xs font-bold mb-4">{pwdError}</div>}
+            <form onSubmit={handlePasswordChange} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Yeni Şifre</label>
+                <input required minLength={6} type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-navy-900" placeholder="Min. 6 karakter" />
+              </div>
+              <button disabled={pwdLoading} type="submit" className="w-full py-3 bg-navy-900 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-navy-800 disabled:opacity-50">
+                {pwdLoading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center h-64 text-slate-400 font-bold">Veriler yükleniyor...</div>

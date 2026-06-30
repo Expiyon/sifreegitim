@@ -1,4 +1,4 @@
-import { getDocs, getDoc, setDoc, addDoc, collection, doc, query, where } from 'firebase/firestore';
+import { getDocs, getDoc, setDoc, addDoc, deleteDoc, collection, doc, query, where } from 'firebase/firestore';
 import type { DocumentData, QuerySnapshot, DocumentSnapshot } from 'firebase/firestore';
 
 const READ_TIMEOUT = 15000;
@@ -54,6 +54,10 @@ export async function safeSetDoc(db: any, collectionName: string, docId: string,
 
 export async function safeAddDoc(db: any, collectionName: string, data: any) {
   return withTimeout(addDoc(collection(db, collectionName), data), WRITE_TIMEOUT);
+}
+
+export async function safeDeleteDoc(db: any, collectionName: string, docId: string): Promise<void> {
+  return withTimeout(deleteDoc(doc(db, collectionName, docId)), WRITE_TIMEOUT);
 }
 
 export { query, where, collection, doc };
