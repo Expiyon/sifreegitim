@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin: listedeki e-posta VEYA users/{uid} dokümanında role == "admin"
+    function isAdmin() {
+      return request.auth != null
+        && (
+          (request.auth.token.email is string
+            && request.auth.token.email.lower() in [
+              'yonetici@sifreakademi.com',
+            ])
+          || (
+            exists(/databases/$(database)/documents/users/$(request.auth.uid))
+            && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          )
+        );
+    }
+
+    // Kullanıcı profilleri — kendi kaydını veya admin tümünü okur; yazma çoğunlukla admin
+    match /users/{userId} {
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && isAdmin();
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
+    // Sınav sonuçları — öğrenci sadece kendi uid ile eşleşenleri sorgular; admin tam yetki
+    match /exams/{examId} {
+      allow read: if request.auth != null
+        && (resource.data.student_id == request.auth.uid || isAdmin());
+      allow create, update, delete: if request.auth != null && isAdmin();
+    }
+
+    // Yaklaşan sınavlar — giriş yapmış herkes okur; sadece admin yazar
+    match /upcoming_exams/{docId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Diğer tüm yollar kapalı
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
