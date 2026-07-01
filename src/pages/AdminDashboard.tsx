@@ -489,37 +489,38 @@ export default function AdminDashboard() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-navy-900 leading-tight mb-2">Öğrenci Kayıtları</h1>
-          <p className="text-slate-500 font-medium">Akademik profilleri ve sınav performanslarını yönetin.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-navy-900 leading-tight mb-1 sm:mb-2">Öğrenci Kayıtları</h1>
+          <p className="text-sm sm:text-base text-slate-500 font-medium">Akademik profilleri ve sınav performanslarını yönetin.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={openBulkModal} className="px-4 py-2 bg-navy-900 text-white rounded-full flex items-center gap-2 text-sm font-bold hover:bg-navy-800 transition-colors">
-            <ClipboardList className="w-4 h-4" /> Toplu Not Girişi
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button onClick={openBulkModal} className="px-3 sm:px-4 py-2 bg-navy-900 text-white rounded-full flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold hover:bg-navy-800 transition-colors">
+            <ClipboardList className="w-4 h-4" /> <span className="hidden sm:inline">Toplu Not Girişi</span><span className="sm:hidden">Toplu Not</span>
           </button>
-          <button onClick={() => setExamModal(true)} className="px-4 py-2 bg-teal-50 text-teal-700 rounded-full flex items-center gap-2 text-sm font-bold hover:bg-teal-100 transition-colors">
-            <CalendarPlus className="w-4 h-4" /> Sınav Tarihi Ekle
+          <button onClick={() => setExamModal(true)} className="px-3 sm:px-4 py-2 bg-teal-50 text-teal-700 rounded-full flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold hover:bg-teal-100 transition-colors">
+            <CalendarPlus className="w-4 h-4" /> <span className="hidden sm:inline">Sınav Tarihi Ekle</span><span className="sm:hidden">Sınav Ekle</span>
           </button>
-          <div className="px-4 py-2 bg-slate-100 rounded-full flex items-center gap-2 text-sm font-bold text-navy-900">
+          <div className="px-3 sm:px-4 py-2 bg-slate-100 rounded-full flex items-center gap-2 text-xs sm:text-sm font-bold text-navy-900">
             <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-            {students.length} Kayıtlı Öğrenci
+            {students.length} Öğrenci
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
         {/* Main Content */}
-        <div className="col-span-8">
-          <div className="flex gap-4 mb-6">
+        <div className="lg:col-span-8 order-2 lg:order-1">
+          <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="İsim, numara veya alana göre ara..." className="pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-navy-900 w-full shadow-sm" />
+              <Search className="w-4 h-4 absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="İsim, numara veya alan ara..." className="pl-9 sm:pl-11 pr-4 py-2.5 sm:py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-navy-900 w-full shadow-sm" />
             </div>
           </div>
 
-          <Card className="border border-slate-100 shadow-sm overflow-hidden bg-white">
-            <div className="bg-slate-100/50 px-8 py-4 grid grid-cols-12 gap-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200">
+          {/* Desktop Table */}
+          <Card className="border border-slate-100 shadow-sm overflow-hidden bg-white hidden md:block">
+            <div className="bg-slate-100/50 px-6 lg:px-8 py-4 grid grid-cols-12 gap-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200">
               <div className="col-span-4">Öğrenci Bilgisi</div>
               <div className="col-span-3">Alan</div>
               <div className="col-span-5 text-right">İşlemler</div>
@@ -533,7 +534,7 @@ export default function AdminDashboard() {
                 </div>
               )}
               {filtered.map((student) => (
-                <div key={student.uid} className="grid grid-cols-12 gap-4 items-center px-8 py-5 hover:bg-slate-50/50 transition-colors group">
+                <div key={student.uid} className="grid grid-cols-12 gap-4 items-center px-6 lg:px-8 py-5 hover:bg-slate-50/50 transition-colors group">
                   <div className="col-span-4 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold text-lg shadow-sm">
                       {student.name.charAt(0).toUpperCase()}
@@ -570,11 +571,51 @@ export default function AdminDashboard() {
               </div>
             )}
           </Card>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {!studentsLoaded && <div className="text-center text-slate-400 text-sm py-8">Yükleniyor...</div>}
+            {studentsLoaded && filtered.length === 0 && (
+              <div className="text-center text-slate-400 text-sm py-8">
+                {students.length === 0 ? 'Henüz kayıtlı öğrenci yok.' : 'Aramayla eşleşen öğrenci bulunamadı.'}
+              </div>
+            )}
+            {filtered.map((student) => (
+              <Card key={student.uid} className="p-4 border border-slate-100 shadow-sm bg-white">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+                    {student.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-navy-900 text-sm truncate">{student.name}</div>
+                    <div className="text-xs text-slate-500 font-medium truncate">No: {student.student_id} • {student.email}</div>
+                  </div>
+                  <span className={`px-2.5 py-1 text-[9px] font-bold rounded-full shrink-0 ${batchColor(student.batch)}`}>
+                    {student.batch || '—'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                  <button onClick={() => openHistory(student)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-navy-900 hover:bg-slate-100 transition-colors">
+                    <Eye className="w-3.5 h-3.5" /> Geçmiş
+                  </button>
+                  <button onClick={() => { setScoreStudent(student); setScoreModal(true); setScoreError(''); setScoreSuccess(''); }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold bg-navy-900 text-white hover:bg-navy-800 transition-colors">
+                    <span className="text-base leading-none">+</span> Not Ekle
+                  </button>
+                  <button onClick={() => setDeleteConfirm(student)} className="p-2 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors" title="Sil">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </Card>
+            ))}
+            {filtered.length > 0 && (
+              <div className="text-xs text-slate-400 text-center py-2">{filtered.length} öğrenci listeleniyor</div>
+            )}
+          </div>
         </div>
 
         {/* Sidebar */}
-        <div className="col-span-4 space-y-6">
-          <Card className="bg-navy-900 text-white border-none shadow-md overflow-hidden relative p-8">
+        <div className="lg:col-span-4 space-y-4 sm:space-y-6 order-1 lg:order-2">
+          <Card className="bg-navy-900 text-white border-none shadow-md overflow-hidden relative p-5 sm:p-8">
             <div className="flex justify-between items-start relative z-10 mb-8">
               <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase">Toplam Kayıt</h3>
               <Zap className="w-4 h-4 text-accent" />
@@ -614,7 +655,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          <Card className="p-8 border border-slate-100 shadow-sm bg-[#f8fafc] overflow-y-auto max-h-[700px]">
+          <Card className="p-5 sm:p-8 border border-slate-100 shadow-sm bg-[#f8fafc] overflow-y-auto max-h-[700px]">
             <div className="flex items-center gap-3 mb-6">
               <UserPlus className="w-5 h-5 text-navy-900" />
               <h3 className="text-lg font-bold text-navy-900">Yeni Öğrenci Kaydı</h3>

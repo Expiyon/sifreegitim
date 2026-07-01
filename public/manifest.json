@@ -1,0 +1,22 @@
+{
+  "name": "Şifre Akademi",
+  "short_name": "Şifre Akademi",
+  "description": "Ankara Kızılay'da butik YKS hazırlık kursu. Sınırlı kontenjan, kişiye özel program, etüt desteği.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0a1930",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
